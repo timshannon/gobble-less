@@ -1,0 +1,19 @@
+{
+  "name": "gobble-less",
+  "version": "0.1.0",
+  "description": "Compile LESS files with gobble",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/tshannon/gobble-less"
+  },
+  "dependencies": {
+    "less": "^2.5.0",
+    "sander": "^0.2.1"
+  },
+  "keywords": [
+    "gobble-plugin"
+  ],
+  "author": "Tim Shannon",
+  "license": "MIT"
+}
