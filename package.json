@@ -1,6 +1,6 @@
 {
   "name": "gobble-less",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Compile LESS files with gobble",
   "main": "index.js",
   "repository": {
