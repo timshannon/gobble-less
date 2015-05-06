@@ -14,8 +14,12 @@ module.exports = function less(inputdir, outputdir, options, callback) {
     var input = sander.readFileSync(options.filename).toString();
     require('less').render(input, options)
         .then(function(result) {
+                var outputName = options.dest;
+                if (options.compress) {
+                    outputName = path.basename(outputName, path.extname(outputName)) + ".min" + path.extname(outputName);
+                }
                 var promises = [
-                    sander.writeFile(outputdir, options.dest, result.css)
+                    sander.writeFile(outputdir, outputName, result.css)
                 ];
 
                 if (result.map) {
