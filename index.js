@@ -1,7 +1,7 @@
 module.exports = function less(inputdir, outputdir, options, callback) {
     var path = require('path'),
-        sander = require('sander');
-
+        sander = require('sander'),
+        cheerio = require('cheerio');
     if (!options.src || !options.dest) {
         throw new Error('gobble-less requires `options.src` and `options.dest` to be set');
     }
@@ -11,18 +11,35 @@ module.exports = function less(inputdir, outputdir, options, callback) {
         // by default, generate sourcemaps and include comments
         options.sourceMap = {};
     }
-    var input = sander.readFileSync(options.filename).toString();
+
+    var input;
+    var $;
+    var fileInput = sander.readFileSync(options.filename).toString();
+    if (endsWith(options.filename, ".html") || options.isHTML) {
+        options.isHTML = true;
+        $ = cheerio.load(fileInput);
+        input = $("style[type='text/less']").text();
+    } else {
+        input = fileInput;
+    }
     require('less').render(input, options)
         .then(function(result) {
                 var outputName = options.dest;
-                if (options.compress) {
+                if (options.compress && !options.isHTML) {
                     outputName = path.basename(outputName, path.extname(outputName)) + ".min" + path.extname(outputName);
                 }
+                var out = result.css;
+
+                if (options.isHTML && $) {
+                    $("style[type='text/less']").attr("type", "text/css").text(result.css);
+                    out = $.html();
+                }
+
                 var promises = [
-                    sander.writeFile(outputdir, outputName, result.css)
+                    sander.writeFile(outputdir, outputName, out)
                 ];
 
-                if (result.map) {
+                if (result.map && !options.isHTML) {
                     promises.push(sander.writeFile(outputdir, options.dest + '.map', result.map));
                 }
 
@@ -33,3 +50,7 @@ module.exports = function less(inputdir, outputdir, options, callback) {
             },
             callback);
 };
+
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
