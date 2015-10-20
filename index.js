@@ -31,8 +31,9 @@ module.exports = function less(inputdir, outputdir, options, callback) {
                 var out = result.css;
 
                 if (options.isHTML && $) {
-                    $("style[type='text/less']").attr("type", "text/css").text(result.css);
-                    out = $.html();
+                    var before = $.html("style[type='text/less']");
+                    var after = $.html($("style[type='text/less']").attr("type", "text/css")).replace(input, result.css);
+                    out = fileInput.replace(before, after);
                 }
 
                 var promises = [
